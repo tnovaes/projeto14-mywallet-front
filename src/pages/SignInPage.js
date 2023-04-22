@@ -12,7 +12,7 @@ export default function SignInPage() {
 
 
   function handleForm(e) {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    setForm({ ...form, [e.target.name]: e.target.value });
   }
 
 
@@ -28,7 +28,6 @@ export default function SignInPage() {
       .catch(err => {
         alert(err.response.data);
       })
-
   }
 
   return (
