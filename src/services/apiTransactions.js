@@ -16,8 +16,9 @@ function getBalance(token) {
 
 }
 
-function newTransaction() {
-
+function newTransaction(token, body) {
+    const promise = axios.post(`${BASE_URL}/transactions`, body, createConfig(token));
+    return promise;
 }
 
 const apiTransactions = { getBalance, newTransaction }

@@ -19,7 +19,6 @@ export default function HomePage() {
     apiTransactions.getBalance(user.token)
       .then(res => {
         const apiTransaction = res.data;
-        console.log(apiTransaction);
         setBalance(apiTransaction);
         let balanceCalc = 0;
         apiTransaction.forEach(t => {
@@ -124,10 +123,12 @@ const TransactionsContainer = styled.article`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  max-height: calc(100vh - 250px);
   ul {
     overflow-y: scroll;
   }
   article {
+    margin-top:15px;
     display: flex;
     justify-content: space-between;   
     strong {
