@@ -4,22 +4,21 @@ import HomePage from "./pages/HomePage"
 import SignInPage from "./pages/SignInPage"
 import SignUpPage from "./pages/SignUpPage"
 import TransactionsPage from "./pages/TransactionPage"
-import { UserContext } from "./contexts/UserContext.js"
-import { useState } from "react";
+import UserProvider from "./contexts/UserContext.js"
+
 
 export default function App() {
-  const [user, setUser] = useState({});
   return (
     <PagesContainer>
       <BrowserRouter>
-        <UserContext.Provider value={{ user, setUser }}>
+        <UserProvider>
           <Routes>
             <Route path="/" element={<SignInPage />} />
             <Route path="/cadastro" element={<SignUpPage />} />
             <Route path="/home" element={<HomePage />} />
             <Route path="/nova-transacao/:tipo" element={<TransactionsPage />} />
           </Routes>
-        </UserContext.Provider>
+        </UserProvider>
       </BrowserRouter>
     </PagesContainer>
   )

@@ -32,15 +32,24 @@ export default function HomePage() {
 
       })
       .catch(err => {
-        alert(err.response.data.message);
+        if (!user.token) {
+          alert("Faça login");
+        } else {
+          alert(err.response.data.message);
+        }
       })
+  }
+
+  function logout() {
+    localStorage.clear();
+    window.location.reload();
   }
 
   return (
     <HomeContainer>
       <Header>
         <h1>Olá, {user.name}</h1>
-        <BiExit />
+        <BiExit onClick={logout} />
       </Header>
 
       <TransactionsContainer>
@@ -73,7 +82,7 @@ export default function HomePage() {
         {balance.length === 0 ? <></> :
           <article>
             <strong>Saldo</strong>
-            <Value color={totalBalance > 0 ? "positivo" : "negativo"}>${(totalBalance/100)
+            <Value color={totalBalance > 0 ? "positivo" : "negativo"}>${(totalBalance / 100)
               .toLocaleString("pt-br", {
                 style: "decimal",
                 minimumFractionDigits: 2,

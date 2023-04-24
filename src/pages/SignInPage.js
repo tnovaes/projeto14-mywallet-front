@@ -23,6 +23,7 @@ export default function SignInPage() {
       .then(res => {
         const { name, token } = res.data;
         setUser({ name, token });
+        localStorage.setItem("user", JSON.stringify({ name, token }));
         navigate("/home");
       })
       .catch(err => {
