@@ -1,47 +1,97 @@
-import styled from "styled-components"
-import { BiExit } from "react-icons/bi"
-import { AiOutlineMinusCircle, AiOutlinePlusCircle } from "react-icons/ai"
+import styled from "styled-components";
+import { BiExit } from "react-icons/bi";
+import { AiOutlineMinusCircle, AiOutlinePlusCircle } from "react-icons/ai";
+import { useContext, useEffect, useState } from "react";
+import { UserContext } from "../contexts/UserContext.js";
+import apiTransactions from "../services/apiTransactions.js";
+import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
+  const [balance, setBalance] = useState([]);
+  const [totalBalance, setTotalBalance] = useState([]);
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
+
+
+  useEffect(listBalance, []);
+
+  function listBalance() {
+    apiTransactions.getBalance(user.token)
+      .then(res => {
+        const apiTransaction = res.data;
+        console.log(apiTransaction);
+        setBalance(apiTransaction);
+        let balanceCalc = 0;
+        apiTransaction.forEach(t => {
+          if (t.type === "deposit") {
+            balanceCalc = balanceCalc + t.value;
+          } else {
+            balanceCalc = balanceCalc - t.value;
+          }
+        })
+        setTotalBalance(balanceCalc);
+
+      })
+      .catch(err => {
+        alert(err.response.data.message);
+      })
+  }
+
   return (
     <HomeContainer>
       <Header>
-        <h1>Olá, Fulano</h1>
+        <h1>Olá, {user.name}</h1>
         <BiExit />
       </Header>
 
       <TransactionsContainer>
         <ul>
-          <ListItemContainer>
-            <div>
-              <span>30/11</span>
-              <strong>Almoço mãe</strong>
-            </div>
-            <Value color={"negativo"}>120,00</Value>
-          </ListItemContainer>
-
-          <ListItemContainer>
-            <div>
-              <span>15/11</span>
-              <strong>Salário</strong>
-            </div>
-            <Value color={"positivo"}>3000,00</Value>
-          </ListItemContainer>
+          {balance.length === 0 ?
+            (
+              <NoTransactions>
+                <h1>Não há registros de entrada ou saída</h1>
+              </NoTransactions>
+            ) :
+            (
+              balance.map((b, index) =>
+                <ListItemContainer key={index}>
+                  <div>
+                    <span>{b.date}</span>
+                    <strong>{b.description}</strong>
+                  </div>
+                  <Value color={b.type === "deposit" ? "positivo" : "negativo"}>{((b.value) / 100)
+                    .toLocaleString("pt-br", {
+                      style: "decimal",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </Value>
+                </ListItemContainer>
+              )
+            )
+          }
         </ul>
-
-        <article>
-          <strong>Saldo</strong>
-          <Value color={"positivo"}>2880,00</Value>
-        </article>
+        {balance.length === 0 ? <></> :
+          <article>
+            <strong>Saldo</strong>
+            <Value color={totalBalance > 0 ? "positivo" : "negativo"}>${(totalBalance/100)
+              .toLocaleString("pt-br", {
+                style: "decimal",
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </Value>
+          </article>
+        }
       </TransactionsContainer>
 
 
       <ButtonsContainer>
-        <button>
+        <button onClick={() => navigate("/nova-transacao/entrada")}>
           <AiOutlinePlusCircle />
           <p>Nova <br /> entrada</p>
         </button>
-        <button>
+        <button onClick={() => navigate("/nova-transacao/saida")}>
           <AiOutlineMinusCircle />
           <p>Nova <br />saída</p>
         </button>
@@ -74,6 +124,9 @@ const TransactionsContainer = styled.article`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  ul {
+    overflow-y: scroll;
+  }
   article {
     display: flex;
     justify-content: space-between;   
@@ -117,5 +170,20 @@ const ListItemContainer = styled.li`
   div span {
     color: #c6c6c6;
     margin-right: 10px;
+  }
+`
+
+const NoTransactions = styled.div`
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  h1 {
+    text-align: center;
+    color: #868686;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 23px;
   }
 `
